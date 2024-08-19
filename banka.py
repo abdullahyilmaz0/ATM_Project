@@ -5,9 +5,16 @@ import csv
 hesaplar={ }
 def olustur():
     global hesaplar
-    ad =input("isminizi giriniz...:")
-    soyad=input("soyadinizi giriniz...")
-    bakiye=int(input("bakiye girisi yapiniz...:"))
+    
+    while True:
+        try:
+            ad =str(input("isminizi giriniz...:"))           
+            soyad=str(input("soyadinizi giriniz..."))
+            bakiye = int(input("Lütfen bakiye girisi yapiniz...: "))
+            break
+        except ValueError:
+            print("Lütfen sadece rakam kullanin !")
+            continue
     hn=f"{ad[0].upper()}{soyad[0].upper()}{random.randint(100000,999999)}"
     hesaplar[hn]={"ad": ad, "soyad": soyad, "bakiye": bakiye}
 
