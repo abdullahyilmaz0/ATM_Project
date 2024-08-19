@@ -3,6 +3,7 @@ import random
 import csv
 
 hesaplar={ }
+
 def olustur():
     global hesaplar
     ad =input("isminizi giriniz...:")
@@ -10,11 +11,17 @@ def olustur():
     bakiye=int(input("bakiye girisi yapiniz...:"))
     hn=f"{ad[0].upper()}{soyad[0].upper()}{random.randint(100000,999999)}"
     hesaplar[hn]={"ad": ad, "soyad": soyad, "bakiye": bakiye}
-
+    csv_file='data.csv'
+    if not os.path.isfile(csv_file):    # dosyanin önceden olusturulup olusturulmadugini kontrol etmek icin
+        with open(csv_file, 'w', encoding='utf-8') as file_csv: # dosya yoksa yeniden olusturulup sütün adlari eklenir b    
+            writer = csv.writer(file_csv)
+            writer.writerow(["Hesap Numarası", "Ad", "Soyad", "Bakiye"])
+        print(f'{csv_file} created.')
+    else:
+        print('File already exists.')
     
-    with open('data.csv', mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Hesap Numarası", "Ad", "Soyad", "Bakiye"])
+    with open(csv_file, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)        
     
         for hesap_no, bilgiler in hesaplar.items():
             writer.writerow([hesap_no, bilgiler["ad"], bilgiler["soyad"], bilgiler["bakiye"]])
