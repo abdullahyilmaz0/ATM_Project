@@ -51,7 +51,7 @@ def olustur():
 #         print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
    
 def para_cek():
-    hesap_no = input("Hesap numaranızı giriniz: ")
+    hesap_no = input("Hesap numaranızı giriniz: ").strip().upper()
     csv_file = 'data.csv'
     with open(csv_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
