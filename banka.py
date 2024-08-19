@@ -25,7 +25,27 @@ def olustur():
 def görüntüle():
     print()
 def bakiye_görüntüle():
-    print()
+    global hesaplar
+    hesap_var_mi = input("Hesabınız var mı? (evet/hayir): ").lower()
+    if hesap_var_mi == "evet":
+        hesap_no = input("Hesap numaranızı giriniz...: ")
+        if hesap_no in hesaplar:
+            print(f"Bakiye: {hesaplar[hesap_no]['bakiye']} TL")
+        else:
+            print("Hesap numarası bulunamadı.")
+    elif hesap_var_mi == "hayir":
+        hesap_olusturmak = input("Hesap oluşturmak ister misiniz? (evet/hayir): ").lower()
+        if hesap_olusturmak == "evet":
+            ad = input("isminizi giriniz...: ")
+            soyad = input("soyadinizi giriniz...: ")
+            olustur(ad, soyad, 0)
+            print("Yeni hesap oluşturuldu. Bakiye: 0 TL")
+        else:
+            print("Hesap oluşturma işlemi iptal edildi.")
+    else:
+        print("Geçersiz seçenek.")
+    
+    ana_menu()
 def para_yatir():
     print()
 def para_cek():
