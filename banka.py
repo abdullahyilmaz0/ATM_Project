@@ -27,6 +27,23 @@ def olustur():
             writer.writerow([hesap_no, bilgiler["ad"], bilgiler["soyad"], bilgiler["bakiye"]])
 
     print("Hesap basariyla kaydedildi.")
+# Para çekme fonksiyonu
+def para_cek():
+    hesap_no = input("Hesap numaranızı giriniz: ")
+    if hesap_no in hesaplar:
+        while True:
+            miktar = int(input("Çekmek istediğiniz miktarı giriniz: "))
+            if hesaplar[hesap_no]['bakiye'] >= miktar:
+                hesaplar[hesap_no]['bakiye'] -= miktar
+                hesaplari_kaydet()  # Güncellenen bakiyeyi dosyaya kaydediyoruz
+                print(f"{miktar} TL çekildi. Kalan bakiye: {hesaplar[hesap_no]['bakiye']} TL")
+                break
+            else:
+                print("Yetersiz bakiye. Lütfen geçerli bir miktar giriniz.")
+    else:
+        print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
+    devam()
+
     
     os.system('cls')
 def görüntüle():
