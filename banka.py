@@ -5,7 +5,7 @@ import csv
 hesaplar={ }
 
 def olustur():
-    global hesaplar
+    global hesaplar, hn
     
     while True:
         try:
@@ -17,7 +17,7 @@ def olustur():
             print("Lütfen sadece rakam kullanin !")
             continue
     hn=f"{ad[0].upper()}{soyad[0].upper()}{random.randint(100000,999999)}"
-    hesaplar[hn]={"ad": ad, "soyad": soyad, "bakiye": bakiye}
+    hesaplar={"Hesap Numarasi": hn, "ad": ad, "soyad": soyad, "bakiye": bakiye}
     csv_file='data.csv'
     if not os.path.isfile(csv_file):    # dosyanin önceden olusturulup olusturulmadugini kontrol etmek icin
         with open(csv_file, 'w', encoding='utf-8') as file_csv: # dosya yoksa yeniden olusturulup sütün adlari eklenir b    
@@ -35,22 +35,48 @@ def olustur():
 
     print("Hesap basariyla kaydedildi.")
 # Para çekme fonksiyonu
+# def para_cek():
+#     hesap_no = input("Hesap numaranızı giriniz: ")
+#     if hesap_no in hesaplar:
+#         while True:
+#             miktar = int(input("Çekmek istediğiniz miktarı giriniz: "))
+#             if hesaplar[hesap_no]['bakiye'] >= miktar:
+#                 hesaplar[hesap_no]['bakiye'] -= miktar
+#                 hesaplari_kaydet()  # Güncellenen bakiyeyi dosyaya kaydediyoruz
+#                 print(f"{miktar} TL çekildi. Kalan bakiye: {hesaplar[hesap_no]['bakiye']} TL")
+#                 break
+#             else:
+#                 print("Yetersiz bakiye. Lütfen geçerli bir miktar giriniz.")
+#     else:
+#         print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
+   
 def para_cek():
     hesap_no = input("Hesap numaranızı giriniz: ")
-    if hesap_no in hesaplar:
-        while True:
-            miktar = int(input("Çekmek istediğiniz miktarı giriniz: "))
-            if hesaplar[hesap_no]['bakiye'] >= miktar:
-                hesaplar[hesap_no]['bakiye'] -= miktar
-                hesaplari_kaydet()  # Güncellenen bakiyeyi dosyaya kaydediyoruz
-                print(f"{miktar} TL çekildi. Kalan bakiye: {hesaplar[hesap_no]['bakiye']} TL")
+    csv_file = 'data.csv'
+    with open(csv_file, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        next(reader)  # skip header row
+        for row in reader:
+            if row[0] == hesap_no:
+                while True:
+                    miktar = int(input("Çekmek istediğiniz miktarı giriniz: "))
+                    if int(row[3]) >= miktar:
+                        new_bakiye = int(row[3]) - miktar
+                        with open(csv_file, 'r+', encoding='utf-8') as file:
+                            lines = file.readlines()
+                            for i, line in enumerate(lines):
+                                if line.startswith(hesap_no + ','):
+                                    lines[i] = f"{hesap_no},{row[1]},{row[2]},{new_bakiye}\n"
+                            file.seek(0)
+                            file.writelines(lines)
+                            file.truncate()
+                        print(f"{miktar} TL çekildi. Kalan bakiye: {new_bakiye} TL")
+                        break
+                    else:
+                        print("Yetersiz bakiye. Lütfen geçerli bir miktar giriniz.")
                 break
-            else:
-                print("Yetersiz bakiye. Lütfen geçerli bir miktar giriniz.")
-    else:
-        print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
-    devam()
-
+        else:
+            print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
     
     os.system('cls')
 def görüntüle():
@@ -59,8 +85,8 @@ def bakiye_görüntüle():
     print()
 def para_yatir():
     print()
-def para_cek():
-    print()
+# def para_cek():
+#     print()
 def transfer():
     print()
 def exit():
