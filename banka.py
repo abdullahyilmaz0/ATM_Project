@@ -1,6 +1,8 @@
 import os
 import random
 import csv
+import re
+import pandas as pd
 
 hesaplar={ }
 
@@ -77,6 +79,72 @@ def para_cek():
                 break
         else:
             print("Hesap bulunamadı. Lütfen geçerli bir hesap numarası giriniz.")
+
+def input_valid_yazi(schreiber):    # Kullanicidan girilen degerlerin yazi olup olmadigini kontrol etmek icin
+    while True:
+        user_input = input(schreiber).strip().upper()
+
+        if user_input.isalpha():
+            return user_input
+        else:
+            print("Yanlış giriş! Lütfen sadece harf girin.\n")
+
+def input_valid_sayi(zahl): # Kullanicidan girilen degerlerin sayi olup olmadigini kontrol etmek icin
+    
+    while True:
+        phone = input(zahl).strip()
+
+        if phone.isdigit():
+            return phone
+        else:
+            print("Yanlış giriş! Lütfen sadece rakam girin.\n")
+
+def input_valid_id():   # Kullanicidan girilen degerlerin belli bir karekter ve degere sahip olup olmadigini kontrol etmek icin
+    pattern = r'^[A-Z]{2}\d{6}$'  # 2 harf (A-Z) ve 6 rakam (0-9)
+    
+    while True:
+        phone = input("Görüntülenecek hesabın hesap numarasını giriniz (2 harf + 6 rakam, toplam 8 karakter): ").strip().upper()
+        
+        if re.match(pattern, phone):
+            return phone
+        else:
+            print("Yanlış giriş! Hesap numarası 2 harf ve ardından 6 rakamdan oluşmalıdır.\n")
+
+def control():  # Kullanicinin menüde kalip kalmayacagini kontrol etmek icin
+    print("""
+1- İşlemlere Devam Etmek
+2- Ana Menüye Dönüş
+ """)
+    sec = input_valid_sayi("Lütfen İşlem Seçiniz...: ")
+    if sec == "1":
+        return True
+    elif sec == "2":
+        return False
+    else:
+        print("Geçersiz seçim, lütfen tekrar deneyin.\n")
+        return control()
+
+def goruntuleme():
+    file_name = 'data.csv'
+    
+    try:
+        df = pd.read_csv(file_name)  # CSV dosyasını pandas modulunde okur
+        while True:
+            query = input_valid_id()
+            
+            # Belirli hesap numarasını sorgulama
+            print()
+            result = df[df.apply(lambda row: query in row.astype(str).values, axis=1)]
+            
+            if not result.empty:
+                print(result.to_string(index=False))
+            else:
+                print("Kayıt bulunamadı.\n")
+            
+            if not control():
+                break
+    except FileNotFoundError:
+        print(f'{file_name} bulunamadı. Lütfen önce dosyayı oluşturun.\n')
     
     os.system('cls')
 def görüntüle():
