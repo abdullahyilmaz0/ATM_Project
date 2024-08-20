@@ -2,7 +2,8 @@ import os
 import random
 import csv
 import re
-import pandas as pd
+import subprocess
+import sys
 
 hesaplar={ }
 
@@ -19,7 +20,8 @@ def olustur():
             print("Lütfen sadece rakam kullanin !")
             continue
     hn=f"{ad[0].upper()}{soyad[0].upper()}{random.randint(100000,999999)}"
-    hesaplar={"Hesap Numarasi": hn, "ad": ad, "soyad": soyad, "bakiye": bakiye}
+    hesaplar = {hn: {"ad": ad, "soyad": soyad, "bakiye": bakiye}}
+    # hesaplar={"Hesap Numarasi": hn, "ad": ad, "soyad": soyad, "bakiye": bakiye}
     csv_file='data.csv'
     if not os.path.isfile(csv_file):    # dosyanin önceden olusturulup olusturulmadugini kontrol etmek icin
         with open(csv_file, 'w', encoding='utf-8') as file_csv: # dosya yoksa yeniden olusturulup sütün adlari eklenir b    
@@ -31,7 +33,7 @@ def olustur():
     
     with open(csv_file, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)        
-    
+        
         for hesap_no, bilgiler in hesaplar.items():
             writer.writerow([hesap_no, bilgiler["ad"], bilgiler["soyad"], bilgiler["bakiye"]])
 
@@ -124,28 +126,54 @@ def control():  # Kullanicinin menüde kalip kalmayacagini kontrol etmek icin
         print("Geçersiz seçim, lütfen tekrar deneyin.\n")
         return control()
 
+def modulu_kontrol_ve_yukle(modul_adi):
+    try:
+        # Modülü import etmeyi deniyoruz
+        __import__(modul_adi)
+        print(f"'{modul_adi}' modülü zaten yüklü.")
+    except ImportError:
+        # Modül yoksa, kullanıcıya yükleme seçeneği sunuyoruz
+        print(f"'{modul_adi}' modülü yüklü değil.")
+        sec = input("Bu modülü yüklemek ister misiniz? (evet/hayır): ").strip().lower()
+        if sec == "evet":
+            print(f"'{modul_adi}' modülü yükleniyor...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", modul_adi])
+            print(f"'{modul_adi}' modülü başarıyla yüklendi.")
+            __import__(modul_adi)  # Yükledikten sonra modülü tekrar import et
+        else:
+            print("Modül yüklenmedi. Program kapatılıyor.")
+            sys.exit()  # Programı kapat
+
 def goruntuleme():
     file_name = 'data.csv'
     
     try:
-        df = pd.read_csv(file_name)  # CSV dosyasını pandas modulunde okur
-        while True:
-            query = input_valid_id()
-            
-            # Belirli hesap numarasını sorgulama
-            print()
-            result = df[df.apply(lambda row: query in row.astype(str).values, axis=1)]
-            
-            if not result.empty:
-                print(result.to_string(index=False))
-            else:
-                print("Kayıt bulunamadı.\n")
-            
-            if not control():
-                break
-    except FileNotFoundError:
-        print(f'{file_name} bulunamadı. Lütfen önce dosyayı oluşturun.\n')
-    
+        import pandas as pd  # İlk olarak pandas modülünü import etmeye çalış
+        
+        try:
+            df = pd.read_csv(file_name)  # CSV dosyasını pandas modülünde okur
+            while True:
+                query = input_valid_id()
+                
+                # Belirli hesap numarasını sorgulama
+                print()
+                result = df[df.apply(lambda row: query in row.astype(str).values, axis=1)]
+                
+                if not result.empty:
+                    print(result.to_string(index=False))
+                else:
+                    print("Kayıt bulunamadı.\n")
+                
+                if not control():
+                    break
+        except FileNotFoundError:
+            print(f'{file_name} bulunamadı. Lütfen önce dosyayı oluşturun.\n')
+    except ImportError:
+        # Eğer pandas modülü yoksa, kullanıcıya yükleme seçeneği sun
+        print("'pandas' modülü bulunamadı.")
+        modulu_kontrol_ve_yukle('pandas')
+        # Pandas yüklendikten sonra işlemi tekrar başlat
+        goruntuleme()  
     os.system('cls')
 def görüntüle():
     print()
@@ -170,7 +198,8 @@ def bakiye_görüntüle():
     else:
         print("Geçersiz seçenek.")
     
-    ana_menu()
+def ana_menu():
+    pass
 def para_yatir():
     print()
 # def para_cek():
@@ -191,7 +220,7 @@ print("""
  """)
 sec=input("LÜtfen Islem Seciniz...:")
 if sec == "1":
-    görüntüle()
+    goruntuleme()
 elif sec=="2":
     bakiye_görüntüle()
 elif sec=="3":
